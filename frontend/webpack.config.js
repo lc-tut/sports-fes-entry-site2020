@@ -1,0 +1,50 @@
+// TODO: CSS とか Sass とかの loader を追加 (Sass のライブラリは dart-sass [npm: sass] が良さげ？)
+// TODO: js の場合の babel-loader やら babel のライブラリの追加
+// TODO: production 用の minify プラグインとか (mini-css-extract-plugin, optimize-css-assets-webpack-plugin) (terser-webpack-plugin は既に require 可能)
+// TODO: development と production の webpack.config.js の分離 (webpack-merge)
+
+const path = require("path")
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const HtmlWebpackPlugin = require("html-webpack-plugin")
+
+module.exports = (env, argv) => {
+  const isProduction = argv.mode === "production"
+
+  return {
+    mode: "development",
+    entry: "./src/index.tsx",
+    devtool: isProduction ? "none" : "source-map",
+
+    output: {
+      path: path.resolve(__dirname, "./dist"),
+      filename: "index.js"
+    },
+    plugins: [
+      new CleanWebpackPlugin(),
+      new HtmlWebpackPlugin({
+        template: "./template/index.html"
+      })
+    ],
+    module: {
+      rules: [
+        {
+          test: /\.tsx?$/,
+          use: "ts-loader"
+        }
+      ]
+    },
+    resolve: {
+      extensions: [".ts", ".tsx", ".js", ".json"]
+    },
+
+    devServer: {
+      // TODO: proxy 設定
+      contentBase: path.resolve(__dirname, "dist"),
+      historyApiFallback: true,
+      // https: true,
+      open: true,
+      port: 8000,
+      proxy: {}
+    }
+  }
+}
