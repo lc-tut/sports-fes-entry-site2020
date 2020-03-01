@@ -9,6 +9,16 @@ const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === "production"
+  const plugins = isProduction ? [
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      template: "./template/index.html"
+    })
+  ] : [
+    new HtmlWebpackPlugin({
+      template: "./template/index.html"
+    })
+  ]
 
   return {
     mode: "development",
@@ -19,12 +29,7 @@ module.exports = (env, argv) => {
       path: path.resolve(__dirname, "./dist"),
       filename: "index.js"
     },
-    plugins: [
-      new CleanWebpackPlugin(),
-      new HtmlWebpackPlugin({
-        template: "./template/index.html"
-      })
-    ],
+    plugins: plugins,
     module: {
       rules: [
         {
@@ -34,7 +39,7 @@ module.exports = (env, argv) => {
       ]
     },
     resolve: {
-      extensions: [".ts", ".tsx", ".js", ".json"]
+      extensions: [".ts", ".tsx", ".js", "jsx", ".json"]
     },
 
     devServer: {
