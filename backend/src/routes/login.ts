@@ -1,22 +1,27 @@
 import { Router } from "express"
+import { UserSession } from "../utils/types"
 
 const loginRouter = Router()
 
-type session = {
-  email: string
-}
-
-loginRouter.get("/", (req, res, next) => {
-  if (req.session!.email) {
-    res.redirect("/")
-  } else {
-    req.session!.email = "hoge@example.com"
-  }
-  next()
+loginRouter.post("/_create", (req, res, next) => {
+  const session = req.session as UserSession
+  session.user = req.body
+  res.send({ status: "ok" })
 })
 
-loginRouter.post("/", (req, res, next) => {
-  req.session!.email = "hoge@example.com"
+loginRouter.post("/_session", (req, res, next) => {
+  const session = req.session as UserSession
+  if (session.user) {
+    res.send(session.user)
+  } else {
+    res.json(null)
+  }
+})
+
+loginRouter.post("/_destroy", (req, res, next) => {
+  req.session!.destroy(err => {
+    console.error(err)
+  })
 })
 
 export default loginRouter

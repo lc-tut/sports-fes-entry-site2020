@@ -6,9 +6,9 @@ import loginRouter from "./routes/login"
 import session, { MemoryStore } from "express-session"
 import connect_redis from "connect-redis"
 import redis from "redis"
+import helmet from "helmet"
 
 const app = express()
-const redisClient = redis.createClient({ host: "redis" })
 const redisStore = connect_redis(session)
 
 const isProduction = process.env.NODE_ENV === "production"
@@ -25,13 +25,15 @@ app.use(session({
   name: "hoge",
   resave: false,
   saveUninitialized: false,
-  store: isProduction ? new redisStore({ client: redisClient }) : new MemoryStore(),
+  store: isProduction ? new redisStore({ client: redis.createClient({ host: "redis" }) }) : new MemoryStore(),
   cookie: {
     // TODO: 本番環境では secure: true などの設定
     // secure: isProduction,
+    sameSite: "lax",
     maxAge: 1000 * 60 * 10
   }
 }))
+app.use(helmet())
 app.use("/teams", teamRouter)
 app.use("/login", loginRouter)
 

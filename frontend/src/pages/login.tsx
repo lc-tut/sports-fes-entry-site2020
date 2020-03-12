@@ -1,9 +1,14 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import firebase from "../utils/firebase"
 
 const Login: React.FC<{}> = () => {
+  const onClick = () => {
+    const provider = new firebase.auth.GoogleAuthProvider()
+    firebase.auth().signInWithRedirect(provider)
+  }
+
   return (
-    <div>This is Login Page</div>
+    <button onClick={ onClick }>Login</button>
   )
 }
 

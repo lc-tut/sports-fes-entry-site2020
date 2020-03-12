@@ -1,7 +1,7 @@
 {
   "name": "spofes-backend",
   "version": "1.0.0",
-  "description": "Backend of tut-sports-fes",
+  "description": "Backend for tut-sports-fes",
   "repository": "https://github.com/lc-tut/sports-fes-entry-site2020",
   "author": "LinuxClub <linuxclub.tut@gmail.com>",
   "license": "MIT",
@@ -12,6 +12,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-session": "^1.17.0",
+    "firebase": "^7.10.0",
     "helmet": "^3.21.3",
     "pg": "^7.18.1",
     "redis": "^3.0.2"

@@ -6,15 +6,18 @@
 const path = require("path")
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require("html-webpack-plugin")
+const Dotenv = require("dotenv-webpack")
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === "production"
   const plugins = isProduction ? [
+    new Dotenv(),
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: "./template/index.html"
     })
   ] : [
+    new Dotenv(),
     new HtmlWebpackPlugin({
       template: "./template/index.html"
     })
@@ -43,13 +46,15 @@ module.exports = (env, argv) => {
     },
 
     devServer: {
-      // TODO: proxy 設定
       contentBase: path.resolve(__dirname, "dist"),
       historyApiFallback: true,
       // https: true,
       open: true,
       port: 8000,
-      proxy: {}
+      proxy: [{
+        context: ["/login/_create", "/login/_destroy", "/login/_session", "/api"],
+        target: "http://localhost:8080"
+      }]
     }
   }
 }
