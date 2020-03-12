@@ -19,8 +19,9 @@ loginRouter.post("/_session", (req, res, next) => {
 })
 
 loginRouter.post("/_destroy", (req, res, next) => {
+  // TODO: ログアウト処理
   req.session!.destroy(err => {
-    console.error(err)
+    console.log(err)
   })
 })
 

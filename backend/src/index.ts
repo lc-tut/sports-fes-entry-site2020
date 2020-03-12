@@ -1,7 +1,7 @@
 require("dotenv").config()
 import express from "express"
 import path from "path"
-import teamRouter from "./routes/team"
+import apiRouter from "./routes/api"
 import loginRouter from "./routes/login"
 import session, { MemoryStore } from "express-session"
 import connect_redis from "connect-redis"
@@ -34,7 +34,7 @@ app.use(session({
   }
 }))
 app.use(helmet())
-app.use("/teams", teamRouter)
+app.use("/api", apiRouter)
 app.use("/login", loginRouter)
 
 app.get("*", (req, res, next) => {
