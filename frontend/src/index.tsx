@@ -13,45 +13,46 @@ const App: React.FC<{}> = () => {
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    if (isLoaded) {
-      return
-    } else {
-      fetch(LOGIN_URL + "/_session", FETCH_OPTIONS)
-        .then(res => res.json())
-        .then((json: firebase.User | null) => {
-          if (json) {
-            setIsLoaded(true)
-            setUser(json)
+    let ignore = false // See: L.22
+    ;(async () => {
+      try {
+        const user: firebase.User | null = await (await fetch(LOGIN_URL + "/_session", FETCH_OPTIONS)).json()
+        if (user) {
+          if (!ignore) {
+            // 一番始めの Component かつ一回限りの実行なので Unmount 時のフラグ処理はなくてもいいかもだけど, 一応
+            setUser(user)
             setIsAuth(true)
-          } else {
-            firebase.auth().getRedirectResult()
-              .then(result => {
-                if (result.user) {
-                  fetch(LOGIN_URL + "/_create", setBodyToOption(JSON.stringify(result.user)))
-                    .then(res => res.json())
-                    .then(_ => {
-                      console.log(result.user)
-                      setUser(result.user)
-                      setIsAuth(true)
-                    })
-                    .catch(err => {
-                      console.error(err)
-                    })
-                }
-              })
-              .catch(err => {
-                console.error(err)
-              })
-              .finally(() => {
-                setIsLoaded(true)
-              })
-            }
-          })
-          .catch(err => {
-            console.error(err)
-          })
-    }
-  }, [isLoaded])
+          }
+          return
+        }
+      } catch (e) {
+        console.error(e)
+        throw new Error("Failed to load session data")
+      }
+      const result = await firebase.auth().getRedirectResult()
+      if (result.user) {
+        try {
+          await fetch(LOGIN_URL + "/_create", setBodyToOption(JSON.stringify(result.user)))
+        } catch (e) {
+          console.error(e)
+          throw new Error("Failed to create session data")
+        }
+        if (!ignore) {
+          // See: L.22
+          setUser(result.user)
+          setIsAuth(true)
+        }
+      }
+    })()
+      .catch(err => { console.error(err) })
+      .finally(() => {
+        if (!ignore) {
+          // See: L.22
+          setIsLoaded(true)
+        }
+      })
+    return () => { ignore = true } // See: L.22
+  }, [])
 
   return (
     <UserContext.Provider value={{ isLoaded: isLoaded, isAuth: isAuth, user: user }}>
