@@ -38,6 +38,7 @@ const App: React.FC<{}> = () => {
             throw new Error("Failed to create session data")
           }
           if (!ignore) {
+            // See: L.27
             setUser(result.user)
             setIsAuth(true)
           }
@@ -47,6 +48,7 @@ const App: React.FC<{}> = () => {
       .catch(err => { console.error(err) })
       .finally(() => {
         if (!ignore) {
+          // See: L.27
           setIsLoaded(true)
         }
       })
