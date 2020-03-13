@@ -37,13 +37,19 @@ const App: React.FC<{}> = () => {
             console.error(e)
             throw new Error("Failed to create session data")
           }
-          setUser(result.user)
-          setIsAuth(true)
+          if (!ignore) {
+            setUser(result.user)
+            setIsAuth(true)
+          }
         }
       }
     })()
       .catch(err => { console.error(err) })
-      .finally(() => { setIsLoaded(true) })
+      .finally(() => {
+        if (!ignore) {
+          setIsLoaded(true)
+        }
+      })
     return () => { ignore = true } // See: L.27
   }, [])
 
