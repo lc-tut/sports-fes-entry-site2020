@@ -13,46 +13,45 @@ const App: React.FC<{}> = () => {
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    let ignore = false // See: L.27
+    let ignore = false // See: L.22
     ;(async () => {
-      let user: firebase.User | null
       try {
-        user = await (await fetch(LOGIN_URL + "/_session", FETCH_OPTIONS)).json()
+        const user: firebase.User | null = await (await fetch(LOGIN_URL + "/_session", FETCH_OPTIONS)).json()
+        if (user) {
+          if (!ignore) {
+            // 一番始めの Component かつ一回限りの実行なので Unmount 時のフラグ処理はなくてもいいかもだけど, 一応
+            setUser(user)
+            setIsAuth(true)
+          }
+          return
+        }
       } catch (e) {
         console.error(e)
         throw new Error("Failed to load session data")
       }
-      if (user) {
-        if (!ignore) {
-          // 一番始めの Component かつ一回限りの実行なので Unmount 時のフラグ処理はなくてもいいかもだけど, 一応
-          setUser(user)
-          setIsAuth(true)
+      const result = await firebase.auth().getRedirectResult()
+      if (result.user) {
+        try {
+          await fetch(LOGIN_URL + "/_create", setBodyToOption(JSON.stringify(result.user)))
+        } catch (e) {
+          console.error(e)
+          throw new Error("Failed to create session data")
         }
-      } else {
-        const result = await firebase.auth().getRedirectResult()
-        if (result.user) {
-          try {
-            await fetch(LOGIN_URL + "/_create", setBodyToOption(JSON.stringify(result.user)))
-          } catch (e) {
-            console.error(e)
-            throw new Error("Failed to create session data")
-          }
-          if (!ignore) {
-            // See: L.27
-            setUser(result.user)
-            setIsAuth(true)
-          }
+        if (!ignore) {
+          // See: L.22
+          setUser(result.user)
+          setIsAuth(true)
         }
       }
     })()
       .catch(err => { console.error(err) })
       .finally(() => {
         if (!ignore) {
-          // See: L.27
+          // See: L.22
           setIsLoaded(true)
         }
       })
-    return () => { ignore = true } // See: L.27
+    return () => { ignore = true } // See: L.22
   }, [])
 
   return (
