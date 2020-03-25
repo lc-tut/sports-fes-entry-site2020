@@ -32,6 +32,6 @@
   "scripts": {
     "dev": "nodemon",
     "build": "tsc",
-    "start": "rm -r ./dist && yarn run build && cross-env NODE_ENV=production node ./dist/index.js"
+    "start": "rm -rf ./dist && yarn run build && cross-env NODE_ENV=production node ./dist/index.js"
   }
 }
